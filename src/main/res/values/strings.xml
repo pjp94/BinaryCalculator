@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Binary Calculator</string>
+    <string name="button_add">+</string>
+    <string name="button_subtract">-</string>
+    <string name="button_multiply">×</string>
+    <string name="button_divide">÷</string>
+    <string name="button_not">~</string>
+    <string name="button_and">&amp;</string>
+    <string name="button_or">|</string>
+    <string name="button_xor">^</string>
+    <string name="and">AND</string>
+    <string name="or">OR</string>
+    <string name="xor">XOR</string>
+    <string name="button_delete">DEL</string>
+    <string name="button_equals">=</string>
+    <string name="button_0">0</string>
+    <string name="button_1">1</string>
+    <string name="error">ERR</string>
+</resources>
