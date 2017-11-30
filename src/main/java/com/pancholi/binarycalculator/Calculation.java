@@ -22,6 +22,10 @@ class Calculation {
     return inputTwo;
   }
 
+  String getResult() {
+    return result;
+  }
+
   String getOperator() {
     return operator;
   }
