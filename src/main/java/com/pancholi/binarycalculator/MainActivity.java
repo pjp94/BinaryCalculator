@@ -3,8 +3,9 @@ package com.pancholi.binarycalculator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.widget.EditText;
-import android.widget.TextView;
+
+import java.util.Date;
+import java.util.Stack;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -14,13 +15,15 @@ import butterknife.OnLongClick;
 public class MainActivity extends AppCompatActivity {
 
   @BindView(R.id.textInputOne)
-  EditText textInputOne;
+  ExtendedEditText textInputOne;
   @BindView(R.id.textInputTwo)
-  EditText textInputTwo;
+  ExtendedEditText textInputTwo;
   @BindView(R.id.textOperator)
-  TextView textOperator;
+  ExtendedTextView textOperator;
   @BindView(R.id.textResult)
-  TextView textResult;
+  ExtendedTextView textResult;
+
+  Stack<PastCalculation> history = new Stack<PastCalculation>();
 
   boolean isOperationComplete = false;
 
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
   private void enterBit(int value) {
     if (textResult.getText().length() > 0 && isOperationComplete) {
       resetFields();
-      textOperator.setText("");
+      textOperator.clear();
     }
 
     if (textInputTwo.hasFocus()) {
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  private void deleteSingleBit(TextView inputField) {
+  private void deleteSingleBit(ExtendedEditText inputField) {
     String currentValue = inputField.getText().toString();
 
     if (!currentValue.isEmpty()) {
@@ -91,15 +94,15 @@ public class MainActivity extends AppCompatActivity {
   @OnLongClick(R.id.buttonDelete)
   boolean clear() {
     resetFields();
-    textOperator.setText("");
+    textOperator.clear();
     textInputOne.requestFocus();
     return true;
   }
 
   private void clearAllText() {
-    textInputOne.setText("");
-    textInputTwo.setText("");
-    textResult.setText("");
+    textInputOne.clear();
+    textInputTwo.clear();
+    textResult.clear();
   }
 
   @OnClick(R.id.buttonAdd)
@@ -137,15 +140,19 @@ public class MainActivity extends AppCompatActivity {
     } else if (inputValueOne.isEmpty() && !inputValueTwo.isEmpty() && !isOperationComplete) {
       valueToNegate = inputValueTwo;
       textInputTwo.setTextColor(getResources().getColor(R.color.text_inactive));
-    } else if ((inputValueOne.isEmpty() && inputValueTwo.isEmpty() && !resultValue.isEmpty()) &&
-               (!resultValue.isEmpty() && isOperationComplete)) {
-      valueToNegate = resultValue;
-    } else if (!inputValueOne.isEmpty() && !inputValueTwo.isEmpty()) {
+    } else if (!inputValueOne.isEmpty() && !inputValueTwo.isEmpty() && !resultValue.equals(error)) {
       valueToNegate = error;
       textInputOne.setTextColor(getResources().getColor(R.color.text_inactive));
       textInputTwo.setTextColor(getResources().getColor(R.color.text_inactive));
+    } else if (((inputValueOne.isEmpty() && inputValueTwo.isEmpty() && !resultValue.isEmpty()) ||
+               (!resultValue.isEmpty() && isOperationComplete)) && !resultValue.equals(error)) {
+      valueToNegate = resultValue;
+      textInputOne.setText(valueToNegate);
+      textInputTwo.clear();
     } else {
       valueToNegate = "";
+      textInputOne.clear();
+      textInputTwo.clear();
     }
 
     textOperator.setText("~");
@@ -224,7 +231,17 @@ public class MainActivity extends AppCompatActivity {
       String newValue = BinaryOperations.completeOperation(valueOne, valueTwo, operator);
 
       textResult.setText(newValue);
+
+      addToHistory(new Date().toString(), new Calculation(valueOne,
+                                               valueTwo,
+                                               newValue,
+                                               textOperator.getText().toString()));
+
       isOperationComplete = true;
     }
+  }
+
+  private void addToHistory(String date, Calculation calculation) {
+    history.add(new PastCalculation(date, calculation));
   }
 }
